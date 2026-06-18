@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NexusVoice AI</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#f0f2ff 0%,#e8f5ee 50%,#fff0f5 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 2rem}
+.topbar{width:100%;max-width:600px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.logo-row{display:flex;align-items:center;gap:10px}
+.logo-box{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#5b4fff,#00c896);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(91,79,255,0.3)}
+.logo-box svg{width:22px;height:22px;stroke:#fff;fill:none}
+.brand{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.brand .n{color:#5b4fff}.brand .v{color:#00b87a}.brand .a{color:#ff5c7a}
+.ver-badge{background:#ede9ff;color:#5b4fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid #c8bfff;letter-spacing:0.8px}
+.tagline{font-size:13px;color:#999;text-align:center;margin-bottom:4px}
+.mode-row{display:flex;gap:10px;margin-bottom:4px}
+.mtab{padding:10px 24px;border-radius:50px;border:1.5px solid #e0e0f0;background:#fff;font-size:13px;font-weight:600;color:#aaa;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.mtab svg{width:16px;height:16px;stroke:currentColor;fill:none}
+.mtab.av{background:#5b4fff;color:#fff;border-color:#5b4fff;box-shadow:0 4px 166px rgba(91,79,255,0.3)}
+.mtab.at{background:#00b87a;color:#fff;border-color:#00b87a;box-shadow:0 4px 166px rgba(0,184,122,0.3)}
+.main-card{width:100%;max-width:600px;background:#fff;border-radius:28px;border:1px solid #eeeef8;padding:2.5rem 2rem;display:flex;flex-direction:column;align-items:center;gap:1.5rem;box-shadow:0 8px 40px rgba(91,79,255,0.08),0 2px 10px rgba(0,0,0,0.04);margin-bottom:1rem}
+.orb-area{position:relative;width:180px;height:180px;display:flex;align-items:center;justify-content:center;z-index:9999}
+.pr1,.pr2,.pr3{position:absolute;border-radius:50%;opacity:0;pointer-events:none}
+.pr1{inset:-14px;border:2px solid #5b4fff}
+.pr2{inset:-28px;border:1.5px solid #00b87a}
+.pr3{inset:-42px;border:1px solid rgba(255,92,122,0.5)}
+.orb-area.on .pr1{animation:rp 1.8s ease-out infinite}
+.orb-area.on .pr2{animation:rp 1.8s ease-out infinite 0.45s}
+.orb-area.on .pr3{animation:rp 1.8s ease-out infinite 0.9s}
+@keyframes rp{0%{transform:scale(0.9);opacity:0.9}100%{transform:scale(1.12);opacity:0}}
+.mic-btn{width:160px;height:160px;border-radius:50%;border:none;background:linear-gradient(135deg,#5b4fff,#7c6fff);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 36px rgba(91,79,255,0.28);position:relative;z-index:10000;padding:20px}
+.mic-btn svg{width:56px;height:56px;stroke:#fff;fill:none;pointer-events:none}
+.mic-btn.rec{background:linear-gradient(135deg,#ff5c7a,#ff3d60);box-shadow:0 10px 36px rgba(255,92,122,0.3)}
+.mic-btn.rec svg{animation:bpulse 0.8s infinite}
+@keyframes bpulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.wave-row{display:none;align-items:flex-end;gap:4px;height:36px}
+.wave-row.on{display:flex}
+.wave-row span{display:block;width:5px;border-radius:3px;animation:wv 0.9s ease-in-out infinite}
+.wave-row span:nth-child(1){background:#5b4fff}
+.wave-row span:nth-child(2){background:#00b87a;animation-delay:.1s}
+.wave-row span:nth-child(3){background:#5b4fff;animation-delay:.2s}
+.wave-row span:nth-child(4){background:#ff5c7a;animation-delay:.3s}
+.wave-row span:nth-child(5){background:#5b4fff;animation-delay:.4s}
+.wave-row span:nth-child(6){background:#00b87a;animation-delay:.5s}
+@keyframes wv{0%,100%{height:5px}50%{height:28px}}
+.status-row{display:flex;align-items:center;gap:8px}
+.sdot{width:8px;height:8px;border-radius:50%;background:#e0e0e0;flex-shrink:0}
+.sdot.lst{background:#ff5c7a;animation:blink 0.7s infinite}
+.sdot.thk{background:#00b87a;animation:blink 1.1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.stxt{font-size:13px;color:#bbb}
+.timer{font-size:14px;font-weight:700;color:#5b4fff;display:none;font-variant-numeric:tabular-nums;letter-spacing:1.5px}
+.ctrl-row{display:flex;gap:12px;margin-top:5px}
+.stop-btn{padding:12px 32px;border-radius:50px;border:none;background:linear-gradient(135deg,#00b87a,#00d28c);color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,184,122,0.28);transition:all 0.2s}
+.stop-btn svg{width:16px;height:16px;stroke:currentColor;fill:none}
+.stop-btn:disabled{opacity:0.4;cursor:not-allowed;box-shadow:none}
+.txt-zone{display:none;width:100%;max-width:600px;flex-direction:column;gap:12px;margin-bottom:1rem}
+.txt-zone.on{display:flex}
+.txta{width:100%;padding:16px 18px;border-radius:16px;border:1.5px solid #ebebf8;background:#fff;color:#333;font-size:14px;font-family:'Segoe UI',sans-serif;resize:none;min-height:100px;outline:none}
+.txta:focus{border-color:#5b4fff}
+.txta::placeholder{color:#ccc}
+.send-btn{padding:13px 32px;border-radius:50px;border:none;background:linear-gradient(135deg,#00b87a,#00d28c);color:#fff;font-size:14px;font-weight:700;cursor:pointer;align-self:flex-end;display:flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,184,122,0.28)}
+.send-btn svg{width:16px;height:16px;stroke:#fff;fill:none}
+.chat-area{width:100%;max-width:600px;display:flex;flex-direction:column;gap:10px;max-height:280px;overflow-y:auto;margin-top:10px}
+.mwrap{display:flex;flex-direction:column}
+.mwrap.user{align-items:flex-end}
+.mwrap.assistant{align-items:flex-start}
+.mlbl{font-size:10px;color:#ccc;margin-bottom:3px;font-weight:700;text-transform:uppercase}
+.msg{padding:11px 16px;border-radius:14px;font-size:13px;line-height:1.65;max-width:88%}
+.msg.user{background:#ede9ff;color:#3d2db5;border-bottom-right-radius:3px}
+.msg.assistant{background:#e6faf3;color:#0a6644;border-bottom-left-radius:3px}
+.feats{display:flex;gap:22px;padding-top:4px}
+.feat{display:flex;align-items:center;gap:5px;font-size:11px;color:#ccc}
+.feat svg{width:14px;height:14px;stroke:currentColor;fill:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo-row">
+    <div class="logo-box">
+      <svg viewBox="0 0 24 24" stroke-width="2"><path d="M12 3a3 3 0 0 0 -3 3v4a3 3 0 0 0 6 0v-4a3 3 0 0 0 -3 -3z"/><path d="M9 19a6 6 0 0 0 6 0"/><path d="M12 19v3"/></svg>
+    </div>
+    <span class="brand"><span class="n">Nexus</span><span class="v">Voice</span> <span class="a">AI</span></span>
+  </div>
+  <span class="ver-badge">v2.0 PRO</span>
+</div>
+
+<p class="tagline">Intelligent Voice Assistant — Speak or Type, Get Instant AI Responses</p>
+
+<div class="mode-row">
+  <button class="mtab av" onclick="setM('voice')" id="tv">
+    <svg viewBox="0 0 24 24" stroke-width="2"><path d="M12 3a3 3 0 0 0 -3 3v4a3 3 0 0 0 6 0v-4a3 3 0 0 0 -3 -3z"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v5"/></svg>
+    Voice to Text
+  </button>
+  <button class="mtab" onclick="setM('text')" id="tt">
+    <svg viewBox="0 0 24 24" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M18 12h.01M10 12h4M6 16h12"/></svg>
+    Text to Voice
+  </button>
+</div>
+
+<div class="main-card" id="vp">
+  <div class="orb-area" id="orb">
+    <div class="pr1"></div><div class="pr2"></div><div class="pr3"></div>
+    <button class="mic-btn" id="mic" aria-label="Start recording">
+      <span id="mic-icon-container">
+        <svg id="mico" viewBox="0 0 24 24" stroke-width="2"><path d="M12 3a3 3 0 0 0 -3 3v4a3 3 0 0 0 6 0v-4a3 3 0 0 0 -3 -3z"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v5"/></svg>
+      </span>
+    </button>
+  </div>
+  <div class="wave-row" id="wave">
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="status-row">
+    <div class="sdot" id="dot"></div>
+    <span class="stxt" id="stxt">Click the mic to start listening</span>
+    <span class="timer" id="tmr">0:00</span>
+  </div>
+  <div class="ctrl-row">
+    <button class="stop-btn" id="stopb" disabled onclick="sendVoiceMessage()">
+      <svg viewBox="0 0 24 24" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Message
+    </button>
+  </div>
+</div>
+
+<div class="txt-zone" id="tz">
+  <textarea class="txta" id="txta" placeholder="Type your message — AI will read the response aloud..."></textarea>
+  <button class="send-btn" onclick="sndTxt()">
+    <svg viewBox="0 0 24 24" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send &amp; Speak
+  </button>
+</div>
+
+<div class="chat-area" id="chat-voice"></div>
+<div class="chat-area" id="chat-text" style="display: none;"></div>
+
+<div class="feats">
+  <div class="feat"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M12 3l8 4v6c0 5.55 -3.84 10.74 -8 12c-4.16 -1.26 -8 -6.45 -8 -12v-6l8 -4z"/></svg> Secure</div>
+  <div class="feat"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M13 2l-2 10h9l-11 10l2 -10h-9z"/></svg> Real-time AI</div>
+</div>
+
+<script>
+let isR = false;
+let tInt = null;
+let secs = 0;
+let mode = 'voice';
+let recognizedText = ""; 
+
+// Explicit Global Tab Navigation Routing
+window.setM = function(m) {
+  mode = m;
+  if(m === 'text') uiStopState();
+  document.getElementById('tv').className = 'mtab' + (m === 'voice' ? ' av' : '');
+  document.getElementById('tt').className = 'mtab' + (m === 'text' ? ' at' : '');
+  
+  // Interface View Toggles
+  document.getElementById('vp').style.display = m === 'voice' ? 'flex' : 'none';
+  document.getElementById('tz').style.display = m === 'text' ? 'flex' : 'none';
+  
+  // Independent Chat Data Stream Isolation Toggles
+  document.getElementById('chat-voice').style.display = m === 'voice' ? 'flex' : 'none';
+  document.getElementById('chat-text').style.display = m === 'text' ? 'flex' : 'none';
+}
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+
+if (SR) {
+  rec = new SR();
+  rec.lang = 'en-US';
+  rec.continuous = true; 
+  rec.interimResults = false; 
+  rec.maxAlternatives = 1;
+
+  rec.onresult = (e) => {
+    let currentChunk = "";
+    for (let i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i][0] && e.results[i][0].transcript) {
+        currentChunk += e.results[i][0].transcript + " ";
+      }
+    }
+    recognizedText += currentChunk;
+    console.log("Captured stable data stream:", recognizedText);
+  };
+  
+  rec.onerror = (e) => {
+    console.error("Speech Framework Log:", e.error);
+    if (e.error === 'network') {
+      setS('', 'Local sync lag. Try testing on Google Chrome window.');
+    }
+  };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const micBtn = document.getElementById('mic');
+  if(micBtn) {
+    micBtn.addEventListener('click', () => {
+      if (isR) { 
+        sendVoiceMessage(); 
+      } else { 
+        startListening(); 
+      }
+    });
+  }
+});
+
+function startListening() {
+  if(!SR) { setS('', 'Speech API missing/blocked.'); return; }
+  isR = true;
+  recognizedText = ""; 
+  secs = 0;
+  
+  document.getElementById('mic').classList.add('rec');
+  document.getElementById('mic-icon-container').innerHTML = `<svg id="mico" viewBox="0 0 24 24" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>`;
+  document.getElementById('orb').classList.add('on');
+  document.getElementById('stopb').disabled = false;
+  document.getElementById('wave').classList.add('on');
+  document.getElementById('tmr').style.display = 'inline';
+  setS('lst', 'Recording voice... Click Send when done.');
+  
+  if (tInt) clearInterval(tInt);
+  tInt = setInterval(() => {
+    secs++;
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    document.getElementById('tmr').textContent = m + ':' + String(s).padStart(2, '0');
+  }, 1000);
+
+  try { rec.start(); } catch (err) {}
+}
+
+async function sendVoiceMessage() {
+  if (!isR) return;
+  isR = false;
+  
+  if (tInt) clearInterval(tInt);
+  try { if (rec) rec.stop(); } catch (e) {}
+
+  setTimeout(async () => {
+    const speechText = recognizedText.trim();
+    uiStopState();
+    
+    if (speechText !== "") {
+      aMsg('user', speechText);
+      setS('thk', 'Processing response...');
+      await gAI(speechText);
+    } else {
+      setS('', 'No voice detected. Click Mic to try again.');
+    }
+  }, 350);
+}
+
+function uiStopState() {
+  document.getElementById('mic').classList.remove('rec');
+  document.getElementById('mic-icon-container').innerHTML = `<svg id="mico" viewBox="0 0 24 24" stroke-width="2"><path d="M12 3a3 3 0 0 0 -3 3v4a3 3 0 0 0 6 0v-4a3 3 0 0 0 -3 -3z"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v5"/></svg>`;
+  document.getElementById('orb').classList.remove('on');
+  document.getElementById('stopb').disabled = true;
+  document.getElementById('wave').classList.remove('on');
+  document.getElementById('tmr').style.display = 'none';
+  document.getElementById('tmr').textContent = '0:00';
+}
+
+function setS(t, m) {
+  const d = document.getElementById('dot');
+  if (d) d.className = 'sdot' + (t === 'lst' ? ' lst' : t === 'thk' ? ' thk' : '');
+  const stxt = document.getElementById('stxt');
+  if (stxt) stxt.textContent = m;
+}
+
+async function sndTxt() {
+  const i = document.getElementById('txta');
+  const t = i.value.trim();
+  if (!t) return;
+  aMsg('user', t);
+  i.value = '';
+  await gAI(t);
+}
+
+async function gAI(msg) {
+  try {
+    const r = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg })
+    });
+    const d = await r.json();
+    const rep = d.reply || 'No response.';
+    aMsg('assistant', rep);
+    spk(rep);
+  } catch (e) {
+    aMsg('assistant', 'Backend server connectivity error.');
+    setS('', 'Click the mic to start listening');
+  }
+}
+
+function spk(t) {
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(t);
+  u.lang = 'en-US';
+  u.rate = 1;
+
+  u.onstart = () => {
+    setS('thk', 'AI is responding...');
+  };
+
+  u.onend = () => {
+    setS('', 'Click the mic to start listening');
+  };
+
+  window.speechSynthesis.speak(u);
+}
+
+function aMsg(role, text) {
+  // Selects correct isolated UI channel box target dynamic allocation
+  const targetId = (mode === 'voice') ? 'chat-voice' : 'chat-text';
+  const box = document.getElementById(targetId);
+  if (!box) return;
+  
+  const w = document.createElement('div');
+  w.className = 'mwrap ' + role;
+  const l = document.createElement('div');
+  l.className = 'mlbl';
+  l.textContent = role === 'user' ? 'You' : 'NexusVoice AI';
+  const m = document.createElement('div');
+  m.className = 'msg ' + role;
+  m.textContent = text;
+  w.appendChild(l);
+  w.appendChild(m);
+  box.appendChild(w);
+  box.scrollTop = box.scrollHeight;
+}
+</script>
+</body>
+</html>
